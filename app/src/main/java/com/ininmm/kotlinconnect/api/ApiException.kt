@@ -4,7 +4,7 @@ package com.ininmm.kotlinconnect.api
  * Created by User
  * on 2017/12/10.
  */
-class ApiException(val error: GlobalJson.Error?) : RuntimeException(error?.message) {
+class ApiException(val error: GlobalJson.Error) : RuntimeException(error.message) {
     /**
      * API錯誤代碼
      * @return 錯誤代碼
@@ -13,7 +13,7 @@ class ApiException(val error: GlobalJson.Error?) : RuntimeException(error?.messa
         private set
 
     init {
-        this.errorCode = error?.errorCode
+        this.errorCode = error.errorCode
     }
 
     companion object {
@@ -37,10 +37,10 @@ class ApiException(val error: GlobalJson.Error?) : RuntimeException(error?.messa
                 when (error.errorCode) {
                     "E000" -> {
                         errorMsg.append("Validate Failed\n")
-                        error.error?.fields?.forEach { errorMsg.append(it + "\n") }
+                        error.error.fields?.forEach { errorMsg.append(it + "\n") }
                     }
                     else -> {
-                        errorMsg.append(error.errorCode + "\n" + error.error?.message + "\n")
+                        errorMsg.append(error.errorCode + "\n" + error.error.message + "\n")
                     }
                 }
             } catch (e: Exception) {

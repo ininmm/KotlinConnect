@@ -14,17 +14,13 @@ import java.util.concurrent.TimeUnit
  * on 2017/12/10.
  */
 
-fun <T> Observable<Array<GlobalJson<T>>>.withAPI(): Observable<GlobalJson<T>>? {
+fun <T> Observable<Array<GlobalJson<T>>>.withAPI(): Observable<GlobalJson<T>> {
     return this.flatMap {
         if (it[0].retCode == 1 || it[0].error?.errorCode == ApiException.VALIDATE_FAILED) {
             return@flatMap Observable.just(it[0])
         } else {
-            return@flatMap Observable.error<GlobalJson<T>>(ApiException(when (it[0].error) {
-                null -> {
-                    null
-                }
-                else -> it[0].error!!
-            }))
+//            return@flatMap Observable.error<GlobalJson<T>>(ApiException(when (it[0].error)))
+            return@flatMap Observable.error<GlobalJson<T>>(ApiException(it[0].error!!))
         }
     }
 }
@@ -49,7 +45,7 @@ fun Retrofit.Builder.buildWithAPI(): Retrofit {
         }
     }
     val client = builder.connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build()
-    val baseUrl = "https://www.google.com.tw"
+    val baseUrl = "https://www.ridelife.com.tw"
     val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(client)

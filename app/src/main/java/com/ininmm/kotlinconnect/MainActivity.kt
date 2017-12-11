@@ -57,11 +57,11 @@ class MainActivity : AppCompatActivity() {
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe({
-                    Log.i(localClassName, it!![0]!!.area)
-                    Log.i(localClassName, it[0]!!.windSpeed.toString())
-                    Log.i(localClassName, it[0]!!.humidity.toString())
-                    Log.i(localClassName, it[0]!!.weather)
-                    Log.i(localClassName, it[0]!!.temperatureC.toString())
+                    Log.i(localClassName, it?.get(0)?.area)
+                    Log.i(localClassName, it?.get(0)?.windSpeed.toString())
+                    Log.i(localClassName, it?.get(0)?.humidity.toString())
+                    Log.i(localClassName, it?.get(0)?.weather)
+                    Log.i(localClassName, it?.get(0)?.temperatureC.toString())
                 }, {
                     it.printStackTrace()
                     //create error dialog
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun receiveWeather(latitude: Double, longitude: Double): Observable<Array<WeatherModel?>?>? {
-        return retrofitAPI.getWeather(latitude, longitude).withAPI()!!.map { it.getretVal() }
+        return retrofitAPI.getWeather(latitude, longitude).withAPI().map { it.getretVal() }
     }
 
     fun extensionTest() {
