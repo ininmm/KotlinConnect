@@ -19,6 +19,9 @@ class ApiException(val error: GlobalJson.Error) : RuntimeException(error.message
     companion object {
         var VALIDATE_FAILED = "E000"
         var UNKNOWN_ERROR = "E999"
+        var TOKEN_ERROR = "gf0001001"
+        var TOKEN_EXPIRED = "123"
+        var DUPLICATE_lOGIN = "456"
 
         // error message 以這個為主
         fun handleErrorMsg(error: Throwable): String {

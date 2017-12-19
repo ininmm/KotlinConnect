@@ -1,6 +1,7 @@
 package com.ininmm.kotlinconnect
 
 import android.app.Application
+import io.realm.Realm
 
 /**
  * Created by User
@@ -13,6 +14,8 @@ class KotlinConnectApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+        Realm.init(this)
     }
 
     companion object {

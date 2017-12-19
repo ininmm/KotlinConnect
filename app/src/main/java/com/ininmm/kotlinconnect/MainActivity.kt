@@ -22,14 +22,15 @@ import java.util.concurrent.TimeUnit
 class MainActivity : AppCompatActivity() {
     @Test.Companion.Speed
     private var speed: Long = 0
-    private val retrofitAPI = Retrofit.Builder().buildWithAPI().create(WeatherAPI::class.java)
     private lateinit var baseBean: BaseBean
+    private var myViewModel: MyViewModel? = null
     var Array =  ArrayList<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 //        val basebean = BaseBean.getInstance(this)
 //        apiButton.setOnClickListener { apiClickListener }
+        myViewModel = MyViewModel()
         apiButton.setOnClickListener {
             Log.i(localClassName, "Click!!")
             apiTest()
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
     private fun apiTest() {
         val lat = 24.1111
         val lng = 120.64892
-        receiveWeather(lat, lng)
+        myViewModel?.receiveWeather(lat, lng)
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe({
@@ -66,11 +67,19 @@ class MainActivity : AppCompatActivity() {
                     it.printStackTrace()
                     //create error dialog
                 })
+//        myViewModel?.checkToken()
+//                ?.subscribeOn(Schedulers.io())
+//                ?.observeOn(AndroidSchedulers.mainThread())
+//                ?.subscribe({
+//                    getLog(it)
+//                })
     }
 
-    fun receiveWeather(latitude: Double, longitude: Double): Observable<Array<WeatherModel?>?>? {
-        return retrofitAPI.getWeather(latitude, longitude).withAPI().map { it.getretVal() }
+    private fun getLog(input: Any) {
+        Log.i(localClassName, input.toString())
     }
+
+
 
     fun extensionTest() {
         toast("asdf", Toast.LENGTH_LONG)
