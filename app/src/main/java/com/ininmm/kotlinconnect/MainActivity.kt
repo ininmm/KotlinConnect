@@ -1,23 +1,17 @@
 package com.ininmm.kotlinconnect
 
-import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.Toast
-import com.ininmm.kotlinconnect.Util.toast
-import com.ininmm.kotlinconnect.api.buildWithAPI
-import com.ininmm.kotlinconnect.api.model.WeatherModel
-import com.ininmm.kotlinconnect.api.service.WeatherAPI
-import com.ininmm.kotlinconnect.api.withAPI
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
+import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Function
+import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
-import retrofit2.Retrofit
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     @Test.Companion.Speed
@@ -28,8 +22,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        val basebean = BaseBean.getInstance(this)
-//        apiButton.setOnClickListener { apiClickListener }
         myViewModel = MyViewModel()
         apiButton.setOnClickListener {
             Log.i(localClassName, "Click!!")
@@ -37,18 +29,84 @@ class MainActivity : AppCompatActivity() {
         }
         apiButton.text = getString(R.string.sample_text)
         mainTextView.setText(R.string.app_name)
-//        basebean.dosomething()
         Array.add("A")
         Array.add("B")
         Array.add("C")
         Log.i(localClassName, convertArrayListToString(Array))
         Log.i(localClassName, convertStringToArrayList(convertArrayListToString(Array)).toString())
 
+        var mDisposable: Disposable? = null
+        Observable.create<Int> {
+
+            it.onNext(1)
+            it.onNext(2)
+            it.onNext(3)
+            Log.e("testNever", "ProgressBar Close1")
+            it.onComplete()
+            Log.e("testNever", "ProgressBar Close2")
+        }
+                .flatMap {
+                    Log.e("testNever", "start flatmap")
+                    if (it == 4) {
+                        return@flatMap Observable.just(4)
+                    } else {
+//                        return@flatMap Observable.never<Int>()
+                        return@flatMap Observable.just(it)
+                    }
+                }
+                .doOnTerminate {
+                    Log.e("testNever", "start doOnTerminate")
+                }
+//                .subscribe( object : DisposableObserver<Int>() {
+//
+//                    override fun onStart() {
+//                        super.onStart()
+//                        mDisposable = this
+//                    }
+//
+//                    override fun onNext(t: Int) {
+//                        Log.e("testNever", "subscribe onNext before dispose $t")
+////                        dispose()
+//                        Log.e("testNever", "subscribe onNext after dispose $t")
+//                    }
+//
+//                    override fun onError(e: Throwable) {
+//                    }
+//
+//                    override fun onComplete() {
+//                        if (mDisposable != null) {
+//                            Log.e("testNever", "isDispose ${mDisposable!!.isDisposed}")
+//                        }
+//                    }
+//                })
+                .subscribe({
+                    Log.e("testNever", "subscribe onNext $it")
+                }, { throwable: Throwable? ->
+                    Log.e("testNever", "subscribe onError")
+
+                }, {
+                    Log.e("testNever", "subscribe onComplete")
+
+                }, { disposable: Disposable? ->
+                    mDisposable = disposable
+                    Log.e("testNever", "subscribe onSubscribe")
+                })
     }
 
-    private var apiClickListener: View.OnClickListener = View.OnClickListener {
-        Log.i(localClassName, "Click!!")
-        apiTest()
+    private fun test(): DisposableObserver<Int> {
+        return object : DisposableObserver<Int>() {
+            override fun onComplete() {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onNext(t: Int) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onError(e: Throwable) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+        }
     }
 
     private fun apiTest() {
@@ -67,35 +125,6 @@ class MainActivity : AppCompatActivity() {
                     it.printStackTrace()
                     //create error dialog
                 })
-//        myViewModel?.checkToken()
-//                ?.subscribeOn(Schedulers.io())
-//                ?.observeOn(AndroidSchedulers.mainThread())
-//                ?.subscribe({
-//                    getLog(it)
-//                })
-    }
-
-    private fun getLog(input: Any) {
-        Log.i(localClassName, input.toString())
-    }
-
-
-
-    fun extensionTest() {
-        toast("asdf", Toast.LENGTH_LONG)
-    }
-
-    fun RxjavaTest() {
-        Observable.intervalRange(0, 5, 2, 1, TimeUnit.SECONDS)
-                .doOnSubscribe { Log.i("Reactive1", "doOnSubscribe: " + Thread.currentThread().name) }
-                .subscribeOn(Schedulers.io())
-                .doOnNext { Log.i("Reactive2", Thread.currentThread().name) }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ Log.i("Reactive3", Thread.currentThread().name) })
-    }
-
-    fun setSpeed(@Test.Companion.Speed speed: Long) {
-        this.speed = speed
     }
 
     companion object {
